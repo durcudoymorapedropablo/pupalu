@@ -10,6 +10,20 @@ from functools import wraps
 app = Flask(__name__, static_folder='../frontend/static', template_folder='../frontend')
 
 SECRET_KEY = "pupalu_secret_2024_secure_key"
+
+# ─── CORS ──────────────────────────────────────────────────────────────────────
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    return response
+
+@app.route('/api/<path:path>', methods=['OPTIONS'])
+def options_handler(path):
+    return jsonify({}), 200
+
+
 DB_PATH = os.path.join(os.path.dirname(__file__), 'pupalu.db')
 
 # ─── DATABASE SETUP ────────────────────────────────────────────────────────────
