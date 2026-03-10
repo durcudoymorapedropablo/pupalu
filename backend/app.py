@@ -7,12 +7,15 @@ import os
 import json
 from functools import wraps
 
-# ── Sirve los HTML desde la misma carpeta que app.py ──────────────────────────
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-app = Flask(__name__, static_folder=BASE_DIR, template_folder=BASE_DIR)
+# ── Rutas para estructura backend/app.py + frontend/index.html ────────────────
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))   # carpeta backend/
+ROOT_DIR    = os.path.dirname(BASE_DIR)                    # carpeta raíz del proyecto
+FRONTEND_DIR = os.path.join(ROOT_DIR, 'frontend')          # carpeta frontend/
+
+app = Flask(__name__, static_folder=FRONTEND_DIR, template_folder=FRONTEND_DIR)
 
 SECRET_KEY = "pupalu_secret_2024_secure_key"
-DB_PATH = os.path.join(BASE_DIR, 'pupalu.db')
+DB_PATH = os.path.join(ROOT_DIR, 'pupalu.db')  # DB en la raíz del proyecto
 
 # ─── DATABASE SETUP ────────────────────────────────────────────────────────────
 
@@ -285,15 +288,15 @@ def get_stats(current_user):
         'status_counts': [dict(s) for s in status_counts]
     })
 
-# ─── SERVE FRONTEND (desde la misma carpeta que app.py) ───────────────────────
+# ─── SERVE FRONTEND (desde carpeta frontend/) ─────────────────────────────────
 
 @app.route('/')
 def index():
-    return send_from_directory(BASE_DIR, 'index.html')
+    return send_from_directory(FRONTEND_DIR, 'index.html')
 
 @app.route('/admin')
 def admin():
-    return send_from_directory(BASE_DIR, 'admin.html')
+    return send_from_directory(FRONTEND_DIR, 'admin.html')
 
 # ─── ENDPOINT PARA RECARGAR PRODUCTOS BIOGREEN (útil si ya existía la DB) ─────
 @app.route('/api/admin/reload-products', methods=['POST'])
