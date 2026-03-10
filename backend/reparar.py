@@ -19,8 +19,10 @@ import sqlite3
 import os
 import sys
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'pupalu.db')
+BASE_DIR  = os.path.dirname(os.path.abspath(__file__))  # carpeta backend/
+ROOT_DIR  = os.path.dirname(BASE_DIR)                   # raíz del proyecto
+FRONTEND_DIR = os.path.join(ROOT_DIR, 'frontend')
+DB_PATH   = os.path.join(ROOT_DIR, 'pupalu.db')
 
 # ── Intentar importar werkzeug ──────────────────────────────────────────────
 try:
@@ -76,15 +78,15 @@ else:
     print("\n  Instala con:  pip install werkzeug")
     sys.exit(1)
 
-app_exists = os.path.exists(os.path.join(BASE_DIR, 'app.py'))
-index_exists = os.path.exists(os.path.join(BASE_DIR, 'index.html'))
-admin_exists_f = os.path.exists(os.path.join(BASE_DIR, 'admin.html'))
-db_exists = os.path.exists(DB_PATH)
+app_exists    = os.path.exists(os.path.join(BASE_DIR, 'app.py'))
+index_exists  = os.path.exists(os.path.join(FRONTEND_DIR, 'index.html'))
+admin_exists_f = os.path.exists(os.path.join(FRONTEND_DIR, 'admin.html'))
+db_exists     = os.path.exists(DB_PATH)
 
-ok("app.py encontrado") if app_exists else err("app.py NO encontrado en esta carpeta")
-ok("index.html encontrado") if index_exists else warn("index.html no encontrado (asegúrate que esté aquí)")
-ok("admin.html encontrado") if admin_exists_f else warn("admin.html no encontrado (asegúrate que esté aquí)")
-ok(f"pupalu.db encontrada en {DB_PATH}") if db_exists else info("pupalu.db no existe — se creará nueva")
+ok("app.py encontrado en backend/")          if app_exists    else err("app.py NO encontrado en backend/")
+ok("frontend/index.html encontrado")         if index_exists  else err("frontend/index.html NO encontrado — copia el archivo ahí")
+ok("frontend/admin.html encontrado")         if admin_exists_f else err("frontend/admin.html NO encontrado — copia el archivo ahí")
+ok(f"pupalu.db encontrada")                  if db_exists     else info("pupalu.db no existe — se creará nueva")
 
 print()
 
