@@ -70,20 +70,28 @@ def init_db():
     admin_exists = c.execute("SELECT id FROM users WHERE username='admin'").fetchone()
     if not admin_exists:
         c.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-                  ('admin', generate_password_hash('pupalu2024'), 'admin'))
+                  ('admin', generate_password_hash('pupalu2026'), 'admin'))
 
     # Sample products
     prod_count = c.execute("SELECT COUNT(*) FROM products").fetchone()[0]
     if prod_count == 0:
         sample_products = [
-            ('Blusa Floral Rosa', 'Delicada blusa con estampado floral, perfecta para el verano', 35000, 15, 'Blusas', '🌸'),
-            ('Falda Midi Lavanda', 'Elegante falda midi en tono lavanda, tela fluida premium', 42000, 10, 'Faldas', '💜'),
-            ('Vestido Boho Coral', 'Vestido estilo bohemio en color coral con bordados', 68000, 8, 'Vestidos', '🌺'),
-            ('Top Encaje Nude', 'Top con encaje delicado en tono nude, muy versátil', 28000, 20, 'Tops', '🤍'),
-            ('Pantalón Rosa Pastel', 'Pantalón palazzo en rosa pastel, comodidad y estilo', 45000, 12, 'Pantalones', '🌷'),
-            ('Chaqueta Dusty Rose', 'Chaqueta corta en dusty rose, ideal para looks casuales', 78000, 6, 'Chaquetas', '🌸'),
-            ('Vestido Mini Lila', 'Vestido mini en lila con volantes, perfecto para salidas', 52000, 9, 'Vestidos', '💜'),
-            ('Blusa Off-Shoulder Blanca', 'Romántica blusa off-shoulder con detalles en encaje', 32000, 18, 'Blusas', '🤍'),
+            ('Aceite Esencial Puro Calidez 10ml', 'Aceite esencial puro, ideal para difusores y aromaterapia', 6990, 20, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/03/ACEITE-CALIDEZ-801X801-300x300.webp'),
+            ('Aceite Esencial Puro de Enebro 10ml', 'Aceite esencial de enebro 100% puro para aromaterapia y bienestar', 29990, 15, 'Aromaterapia', 'https://biogreenchile.com/wp-content/uploads/2025/03/ACEITE-ENEBRO-801X801-300x300.webp'),
+            ('Difusor de Aromas Organza 250ml', 'Difusor de ambiente con fragancia Organza, elegante y duradero', 20990, 12, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/03/DIFUSOR-ORGANZA-801X801-300x300.webp'),
+            ('Aromatizante Textil Organza 250ml', 'Aromatizante para telas y ambientes con suave fragancia Organza', 10990, 25, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/03/AROMATIZANTE-ORGANZA-801X801-300x300.webp'),
+            ('Aromatizante Textil Sueños Pack Regalable x4', 'Pack regalable con 4 brumas aromaticas textiles Sueños', 29990, 8, 'Regalables', 'https://biogreenchile.com/wp-content/uploads/2023/11/10308-300x300.jpg'),
+            ('Aceite Arbol de Higo + Difusor Ultrasonico + Bolsa', 'Kit completo: aceite 10ml + difusor ultrasonico + bolsa de regalo', 36980, 6, 'Regalables', 'https://biogreenchile.com/wp-content/uploads/2025/03/PROMO-DIA-DE-LA-MADRE-801X801-300x300.webp'),
+            ('Caja Perfumeros Inspira x4 En Estuche', '4 perfumeros 12ml en estuche de regalo, coleccion Inspira', 24990, 10, 'Regalables', 'https://biogreenchile.com/wp-content/uploads/2025/03/SET-PERFUMEROS-801X801-300x300.webp'),
+            ('Regalable Armonia Textil', 'Pack regalable con aromatizante textil y fragancia Lino', 29590, 10, 'Regalables', 'https://biogreenchile.com/wp-content/uploads/2025/02/REGALABLE-LINO-300X300-2-300x300.webp'),
+            ('Regalable Nardos y Magnolias', 'Pack regalable con fragancia floral de nardos y magnolias', 19990, 14, 'Regalables', 'https://biogreenchile.com/wp-content/uploads/2025/02/REGALABLE-MAGNOLIA-300X300-300x300.webp'),
+            ('Difusor Alma Botanica Canela de Ceylan 250ml', 'Difusor de aromas con extracto natural de Canela de Ceylan', 21990, 11, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-05-300x300.webp'),
+            ('Aromatizante Alma Botanica Canela de Ceylan 330ml', 'Aromatizante ambiental con fragancia natural de canela', 12990, 18, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-01-300x300.webp'),
+            ('Aromatizante Alma Botanica Haba Tonka Repuesto 330ml', 'Repuesto de aromatizante con fragancia Haba Tonka, exotica y calida', 12990, 16, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-04-300x300.webp'),
+            ('Difusor de Aromas Capullo de Lino 100ml', 'Difusor de ambiente con delicada fragancia Capullo de Lino', 18990, 13, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-02-300x300.webp'),
+            ('Aromatizante Textil y Ambiental Bebe 190ml', 'Suave aromatizante para textiles y ambientes, especialmente para bebes', 9990, 20, 'Aromatizantes', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-06-300x300.webp'),
+            ('Crema de Manos y Unas Lavanda 75ml', 'Crema hidratante con aceite esencial de lavanda para manos y unas', 19990, 17, 'Aromaterapia', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-07-300x300.webp'),
+            ('Emulsion Corporal Lavanda 200ml', 'Emulsion corporal hidratante con lavanda natural, textura ligera', 24990, 12, 'Aromaterapia', 'https://biogreenchile.com/wp-content/uploads/2025/02/26107-08-300x300.webp'),
         ]
         for p in sample_products:
             c.execute("INSERT INTO products (name, description, price, stock, category, image) VALUES (?,?,?,?,?,?)", p)
