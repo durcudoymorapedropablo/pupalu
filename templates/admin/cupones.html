@@ -1,0 +1,54 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Cupones{% endblock %}
+{% block page_title %}Gestión de cupones{% endblock %}
+{% block extra_style %}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:16px;padding:28px;width:90%;max-width:460px;}
+.modal h3{font-family:var(--font-serif);font-size:22px;margin-bottom:20px;}
+{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+  <button onclick="document.getElementById('modal-cupon').classList.add('open')" class="btn btn-primary">+ Nuevo cupón</button>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Código</th><th>Tipo</th><th>Valor</th><th>Mínimo</th><th>Usos</th><th>Vence</th><th>Estado</th></tr></thead>
+    <tbody>
+      {% for c in cupones %}
+      <tr>
+        <td><strong style="color:var(--teal);letter-spacing:0.05em;">{{ c.codigo }}</strong></td>
+        <td>{{ c.tipo.title() }}</td>
+        <td>{{ c.valor }}{{ '%' if c.tipo=='porcentaje' else ' CLP' }}</td>
+        <td>${{ '{:,.0f}'.format(c.minimo_compra) }}</td>
+        <td>{{ c.usos_actual }}/{{ c.usos_max }}</td>
+        <td>{{ c.fecha_expira or 'Sin vencimiento' }}</td>
+        <td><span class="badge {% if c.activo %}badge-success{% else %}badge-gray{% endif %}">{{ 'Activo' if c.activo else 'Inactivo' }}</span></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-400);">Sin cupones</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="modal-overlay" id="modal-cupon" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>🏷️ Nuevo cupón</h3>
+    <form method="POST" action="{{ url_for('admin_nuevo_cupon') }}">
+      <div class="form-group"><label>Código *</label><input type="text" name="codigo" class="form-control" required placeholder="PUPALU10" style="text-transform:uppercase;"></div>
+      <div class="form-group"><label>Tipo</label>
+        <select name="tipo" class="form-control"><option value="porcentaje">Porcentaje (%)</option><option value="fijo">Monto fijo ($)</option></select>
+      </div>
+      <div class="form-group"><label>Valor *</label><input type="number" name="valor" class="form-control" required min="0" step="0.01"></div>
+      <div class="form-group"><label>Compra mínima</label><input type="number" name="minimo_compra" class="form-control" min="0" value="0"></div>
+      <div class="form-group"><label>Usos máximos</label><input type="number" name="usos_max" class="form-control" value="100" min="1"></div>
+      <div class="form-group"><label>Fecha de vencimiento</label><input type="date" name="fecha_expira" class="form-control"></div>
+      <div class="form-group"><label><input type="checkbox" name="activo" checked> ✅ Activo</label></div>
+      <div style="display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary" style="flex:1;">Crear cupón</button>
+        <button type="button" onclick="document.getElementById('modal-cupon').classList.remove('open')" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

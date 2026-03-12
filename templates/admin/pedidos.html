@@ -1,0 +1,31 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Pedidos{% endblock %}
+{% block page_title %}Gestión de pedidos{% endblock %}
+{% block content %}
+<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+  {% for est, lbl in [('','Todos'),('pendiente','Pendientes'),('confirmado','Confirmados'),('enviado','Enviados'),('entregado','Entregados'),('cancelado','Cancelados')] %}
+  <a href="{{ url_for('admin_pedidos', estado=est) }}" class="btn btn-sm {% if estado_filter==est %}btn-primary{% else %}btn-outline{% endif %}">{{ lbl }}</a>
+  {% endfor %}
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Número</th><th>Clienta</th><th>Ciudad</th><th>Total</th><th>Pago</th><th>Estado</th><th>Fecha</th><th></th></tr></thead>
+    <tbody>
+      {% for p in pedidos %}
+      <tr>
+        <td><strong style="color:var(--teal);">{{ p.numero }}</strong></td>
+        <td><div>{{ p.nombre_cliente }}</div><div style="font-size:12px;color:var(--gray-400);">{{ p.email_cliente }}</div></td>
+        <td>{{ p.ciudad }}</td>
+        <td><strong>${{ '{:,.0f}'.format(p.total) }}</strong></td>
+        <td>{{ p.metodo_pago }}</td>
+        <td><span class="badge status-{{ p.estado }}">{{ p.estado }}</span></td>
+        <td style="color:var(--gray-400);font-size:13px;">{{ p.fecha[:10] }}</td>
+        <td><a href="{{ url_for('admin_ver_pedido', pid=p.id) }}" class="btn btn-sm btn-outline">Ver</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray-400);">Sin pedidos</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

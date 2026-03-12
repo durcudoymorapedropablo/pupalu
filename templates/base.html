@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Pupalu — Hecho con amor{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal:       #3DBFBF;
+      --teal-dark:  #2A9D9D;
+      --teal-light: #7DDADA;
+      --teal-pale:  #E8F9F9;
+      --teal-ultra: #F0FAFA;
+      --white:      #FFFFFF;
+      --off-white:  #FAFEFE;
+      --gray-100:   #F4F8F8;
+      --gray-200:   #E2EEEE;
+      --gray-400:   #9BBDBD;
+      --gray-600:   #557777;
+      --ink:        #1A3333;
+      --accent:     #FF8FAB;
+      --gold:       #C8A96E;
+      --success:    #22C55E;
+      --danger:     #EF4444;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans:  'Nunito', -apple-system, sans-serif;
+      --shadow-sm:  0 1px 3px rgba(61,191,191,0.12);
+      --shadow-md:  0 4px 20px rgba(61,191,191,0.18);
+      --shadow-lg:  0 8px 40px rgba(61,191,191,0.22);
+      --radius:     12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--off-white);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 0 24px;
+      display: flex; align-items: center; gap: 32px;
+      height: 68px;
+    }
+    .nav-logo img { height: 50px; width: auto; }
+    .nav-links {
+      display: flex; gap: 8px; list-style: none; flex: 1;
+    }
+    .nav-links a {
+      font-size: 14px; font-weight: 500;
+      color: var(--gray-600);
+      text-decoration: none; padding: 6px 14px; border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--teal-dark); background: var(--teal-pale);
+    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .nav-icon-btn {
+      position: relative; width: 40px; height: 40px;
+      border-radius: 10px; border: 1px solid var(--gray-200);
+      background: var(--white); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-600); text-decoration: none;
+      transition: all 0.2s; font-size: 18px;
+    }
+    .nav-icon-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-pale); }
+    .badge {
+      position: absolute; top: -5px; right: -5px;
+      background: var(--teal); color: white;
+      font-size: 10px; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-nav-user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 10px;
+      background: var(--teal-pale); color: var(--teal-dark);
+      font-size: 13px; font-weight: 600;
+      text-decoration: none; border: 1px solid var(--teal-light);
+      transition: all 0.2s;
+    }
+    .btn-nav-user:hover { background: var(--teal); color: white; }
+    .hamburger { display: none; background: none; border: none; cursor: pointer; font-size: 22px; color: var(--ink); }
+
+    /* ── ALERTS ── */
+    .alerts { max-width: 1280px; margin: 0 auto; padding: 12px 24px 0; }
+    .alert {
+      padding: 12px 16px; border-radius: var(--radius);
+      font-size: 14px; font-weight: 500; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .alert-success { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+    .alert-error   { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+    .alert-warning { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+    .alert-info    { background: var(--teal-pale); border: 1px solid var(--teal-light); color: var(--teal-dark); }
+
+    /* ── MAIN ── */
+    main { flex: 1; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 60px 0; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 10px;
+      font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; text-decoration: none;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--teal); color: white; }
+    .btn-primary:hover { background: var(--teal-dark); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--teal); border: 2px solid var(--teal); }
+    .btn-outline:hover { background: var(--teal); color: white; }
+    .btn-dark { background: var(--ink); color: white; }
+    .btn-dark:hover { background: #2a4a4a; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
+    .btn-lg { padding: 14px 32px; font-size: 16px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+    /* ── PRODUCT CARD ── */
+    .product-card { position: relative; }
+    .product-card .img-wrap {
+      aspect-ratio: 1; overflow: hidden;
+      background: var(--gray-100);
+      position: relative;
+    }
+    .product-card .img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .product-card:hover .img-wrap img { transform: scale(1.06); }
+    .product-card .img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--teal-light); font-size: 48px;
+    }
+    .product-card .badge-oferta {
+      position: absolute; top: 10px; left: 10px;
+      background: var(--accent); color: white;
+      font-size: 11px; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; letter-spacing: 0.04em;
+    }
+    .product-card .card-body { padding: 14px 16px 16px; }
+    .product-card .cat-label {
+      font-size: 11px; font-weight: 600; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .product-card h3 {
+      font-family: var(--font-serif); font-size: 17px;
+      color: var(--ink); margin-bottom: 8px; line-height: 1.3;
+    }
+    .product-card .prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .price-current { font-size: 18px; font-weight: 700; color: var(--teal-dark); }
+    .price-original { font-size: 14px; color: var(--gray-400); text-decoration: line-through; }
+    .product-card .card-actions {
+      padding: 0 16px 16px; display: flex; gap: 8px;
+    }
+    .product-card .card-actions .btn { flex: 1; justify-content: center; }
+
+    /* ── GRID ── */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 24px;
+    }
+
+    /* ── BADGES ── */
+    .status-badge {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .status-pendiente  { background: #fef9c3; color: #854d0e; }
+    .status-confirmado { background: var(--teal-pale); color: var(--teal-dark); }
+    .status-enviado    { background: #ede9fe; color: #5b21b6; }
+    .status-entregado  { background: #dcfce7; color: #14532d; }
+    .status-cancelado  { background: #fee2e2; color: #991b1b; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.7);
+      padding: 48px 0 24px;
+      margin-top: auto;
+    }
+    .footer-grid {
+      max-width: 1280px; margin: 0 auto; padding: 0 24px;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 32px;
+    }
+    .footer-brand img { height: 60px; filter: brightness(0) invert(1); margin-bottom: 12px; }
+    .footer-brand p { font-size: 14px; line-height: 1.7; max-width: 260px; }
+    .footer-col h4 {
+      color: white; font-size: 14px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .footer-col a {
+      display: block; color: rgba(255,255,255,0.6);
+      text-decoration: none; font-size: 14px; margin-bottom: 8px;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--teal-light); }
+    .footer-bottom {
+      max-width: 1280px; margin: 0 auto; padding: 20px 24px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between;
+      font-size: 13px; align-items: center;
+    }
+    .social-links { display: flex; gap: 12px; }
+    .social-links a {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.7); text-decoration: none;
+      font-size: 15px; transition: all 0.2s;
+    }
+    .social-links a:hover { background: var(--teal); color: white; }
+
+    /* ── FORMS ── */
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--gray-600); margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-family: var(--font-sans); font-size: 14px;
+      background: var(--white); color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(61,191,191,0.15);
+    }
+    select.form-control { appearance: none; cursor: pointer; }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: block; }
+      .nav-inner { gap: 12px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .section { padding: 36px 0; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    }
+
+    {% block extra_style %}{% endblock %}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="{{ url_for('index') }}" class="nav-logo">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Pupalu" onerror="this.style.display='none'">
+      </a>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('index') }}" {% if request.endpoint=='index' %}class="active"{% endif %}>Inicio</a></li>
+        <li><a href="{{ url_for('tienda') }}" {% if request.endpoint in ['tienda','producto'] %}class="active"{% endif %}>Tienda</a></li>
+        <li><a href="{{ url_for('tienda', categoria='ropa') }}">Ropa</a></li>
+        <li><a href="{{ url_for('tienda', categoria='accesorios') }}">Accesorios</a></li>
+        <li><a href="{{ url_for('tienda', categoria='joyeria') }}">Joyería</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="{{ url_for('tienda') }}?q=" class="nav-icon-btn" title="Buscar">🔍</a>
+        <a href="{{ url_for('carrito') }}" class="nav-icon-btn" title="Carrito">
+          🛍️
+          {% if items_carrito() > 0 %}
+            <span class="badge">{{ items_carrito() }}</span>
+          {% endif %}
+        </a>
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('mi_cuenta') }}" class="btn-nav-user">💚 {{ session.nombre.split()[0] }}</a>
+          {% if session.get('rol') == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-dark">Admin</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline">Entrar</a>
+          <a href="{{ url_for('registro') }}" class="btn btn-sm btn-primary">Registrarse</a>
+        {% endif %}
+        <button class="hamburger" onclick="document.querySelector('.nav-links').style.display='flex'">☰</button>
+      </div>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="alerts">
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ cat }}">
+            {{ '✅' if cat=='success' else '❌' if cat=='error' else 'ℹ️' }} {{ msg }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Pupalu" onerror="this.style.display='none'">
+        <p>Creamos prendas y accesorios femeninos con amor, calidad y estilo único. Cada pieza cuenta una historia.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tienda</h4>
+        <a href="{{ url_for('tienda') }}">Todos los productos</a>
+        <a href="{{ url_for('tienda', categoria='ropa') }}">Ropa</a>
+        <a href="{{ url_for('tienda', categoria='accesorios') }}">Accesorios</a>
+        <a href="{{ url_for('tienda', categoria='joyeria') }}">Joyería</a>
+        <a href="{{ url_for('tienda', categoria='bolsos') }}">Bolsos</a>
+      </div>
+      <div class="footer-col">
+        <h4>Mi cuenta</h4>
+        <a href="{{ url_for('mi_cuenta') }}">Mi perfil</a>
+        <a href="{{ url_for('mi_cuenta') }}">Mis pedidos</a>
+        <a href="{{ url_for('mi_cuenta') }}">Mis favoritos</a>
+        <a href="{{ url_for('carrito') }}">Carrito</a>
+      </div>
+      <div class="footer-col">
+        <h4>Ayuda</h4>
+        <a href="#">Envíos</a>
+        <a href="#">Devoluciones</a>
+        <a href="#">Tallas</a>
+        <a href="#">Contacto</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Pupalu — Hecho con amor 💚</span>
+      <div class="social-links">
+        <a href="#" title="Instagram">📸</a>
+        <a href="#" title="Facebook">📘</a>
+        <a href="#" title="WhatsApp">💬</a>
+        <a href="#" title="TikTok">🎵</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión — Pupalu{% endblock %}
+{% block extra_style %}
+.auth-page { min-height: 70vh; display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+.auth-card { background:var(--white); border:1px solid var(--gray-200); border-radius:20px; padding:40px; width:100%; max-width:420px; box-shadow:var(--shadow-md); }
+.auth-logo { text-align:center; margin-bottom:28px; }
+.auth-logo img { height:70px; }
+.auth-title { font-family:var(--font-serif); font-size:28px; text-align:center; color:var(--ink); margin-bottom:4px; }
+.auth-sub { text-align:center; font-size:14px; color:var(--gray-600); margin-bottom:28px; }
+.auth-divider { text-align:center; color:var(--gray-400); font-size:13px; margin:20px 0; position:relative; }
+.auth-divider::before,.auth-divider::after { content:''; position:absolute; top:50%; width:42%; height:1px; background:var(--gray-200); }
+.auth-divider::before { left:0; } .auth-divider::after { right:0; }
+{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Pupalu" onerror="this.style.display='none'">
+    </div>
+    <h1 class="auth-title">Bienvenida 💚</h1>
+    <p class="auth-sub">Ingresa a tu cuenta Pupalu</p>
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required autofocus placeholder="tu@correo.cl">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" class="form-control" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-top:8px;">Ingresar →</button>
+    </form>
+    <div class="auth-divider">o</div>
+    <p style="text-align:center;font-size:14px;color:var(--gray-600);">
+      ¿No tienes cuenta? <a href="{{ url_for('registro') }}" style="color:var(--teal);font-weight:600;">Regístrate gratis</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Tienda — Pupalu{% endblock %}
+{% block extra_style %}
+.page-header {
+  background: linear-gradient(135deg, var(--teal-pale), var(--white));
+  padding: 40px 0; border-bottom: 1px solid var(--gray-200);
+}
+.page-header h1 { font-family: var(--font-serif); font-size: 36px; color: var(--ink); }
+.page-header p { color: var(--gray-600); margin-top: 4px; }
+
+.tienda-layout { display: grid; grid-template-columns: 260px 1fr; gap: 32px; padding: 40px 0; }
+.sidebar { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; height: fit-content; position: sticky; top: 80px; }
+.sidebar h3 { font-family: var(--font-serif); font-size: 18px; margin-bottom: 16px; color: var(--ink); }
+.sidebar-section { margin-bottom: 28px; }
+.sidebar-section h4 { font-size: 12px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.cat-filter-link {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-radius: 8px; text-decoration: none;
+  color: var(--gray-600); font-size: 14px; transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.cat-filter-link:hover, .cat-filter-link.active { background: var(--teal-pale); color: var(--teal-dark); }
+.cat-filter-link .count { font-size: 12px; background: var(--gray-200); border-radius: 20px; padding: 1px 8px; }
+.precio-range { display: flex; gap: 8px; align-items: center; }
+.precio-range input { width: 90px; padding: 7px 10px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; }
+
+.tienda-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.results-count { font-size: 14px; color: var(--gray-600); }
+.results-count strong { color: var(--ink); }
+
+.empty-state {
+  text-align: center; padding: 80px 20px;
+  color: var(--gray-600);
+}
+.empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+.empty-state h3 { font-family: var(--font-serif); font-size: 24px; color: var(--ink); margin-bottom: 8px; }
+
+@media (max-width: 768px) {
+  .tienda-layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    {% if categoria_actual %}
+      <h1>{{ categoria_actual.nombre }}</h1>
+      <p>{{ categoria_actual.descripcion or 'Explora nuestra colección' }}</p>
+    {% elif q %}
+      <h1>Resultados para "{{ q }}"</h1>
+      <p>{{ productos|length }} producto(s) encontrado(s)</p>
+    {% else %}
+      <h1>Toda la tienda ✨</h1>
+      <p>Descubre nuestra colección completa</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container">
+  <div class="tienda-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Filtros</h3>
+      <div class="sidebar-section">
+        <h4>Categorías</h4>
+        <a href="{{ url_for('tienda') }}" class="cat-filter-link {% if not request.args.get('categoria') %}active{% endif %}">
+          Todas las categorías
+        </a>
+        {% for cat in categorias %}
+        <a href="{{ url_for('tienda', categoria=cat.slug) }}"
+           class="cat-filter-link {% if request.args.get('categoria')==cat.slug %}active{% endif %}">
+          {{ cat.nombre }}
+        </a>
+        {% endfor %}
+      </div>
+      <div class="sidebar-section">
+        <h4>Precio</h4>
+        <form method="GET" action="{{ url_for('tienda') }}">
+          {% if request.args.get('categoria') %}
+            <input type="hidden" name="categoria" value="{{ request.args.get('categoria') }}">
+          {% endif %}
+          {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+          <div class="precio-range" style="margin-bottom:10px;">
+            <input type="number" name="precio_min" placeholder="Mín" value="{{ precio_min }}" min="0">
+            <span>—</span>
+            <input type="number" name="precio_max" placeholder="Máx" value="{{ precio_max }}" min="0">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">Aplicar</button>
+        </form>
+      </div>
+      <div class="sidebar-section">
+        <h4>Ordenar por</h4>
+        <form method="GET" action="{{ url_for('tienda') }}" id="sort-form">
+          {% if request.args.get('categoria') %}
+            <input type="hidden" name="categoria" value="{{ request.args.get('categoria') }}">
+          {% endif %}
+          {% for val, lbl in [('reciente','Más recientes'),('precio_asc','Precio: menor a mayor'),('precio_desc','Precio: mayor a menor'),('nombre','Nombre A-Z')] %}
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;margin-bottom:6px;color:var(--gray-600);">
+            <input type="radio" name="orden" value="{{ val }}" {% if orden==val %}checked{% endif %}
+                   onchange="this.form.submit()" style="accent-color:var(--teal);">
+            {{ lbl }}
+          </label>
+          {% endfor %}
+        </form>
+      </div>
+      {% if q or precio_min or precio_max or request.args.get('categoria') %}
+      <a href="{{ url_for('tienda') }}" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">✕ Limpiar filtros</a>
+      {% endif %}
+    </aside>
+
+    <!-- PRODUCTOS -->
+    <div>
+      <div class="tienda-toolbar">
+        <div class="results-count"><strong>{{ productos|length }}</strong> productos</div>
+        <form method="GET" action="{{ url_for('tienda') }}" style="display:flex;gap:8px;">
+          {% if request.args.get('categoria') %}
+            <input type="hidden" name="categoria" value="{{ request.args.get('categoria') }}">
+          {% endif %}
+          <input type="text" name="q" placeholder="🔍 Buscar producto..." value="{{ q }}"
+                 class="form-control" style="width:240px;">
+          <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+        </form>
+      </div>
+
+      {% if productos %}
+        <div class="products-grid">
+          {% for p in productos %}
+          <div class="card product-card">
+            <a href="{{ url_for('producto', slug=p.slug) }}" style="text-decoration:none;">
+              <div class="img-wrap">
+                {% if p.imagen %}
+                  <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}" loading="lazy">
+                {% else %}
+                  <div class="img-placeholder">🌸</div>
+                {% endif %}
+                {% if p.precio_oferta %}<span class="badge-oferta">OFERTA</span>{% endif %}
+                {% if p.stock == 0 %}<span class="badge-oferta" style="background:var(--gray-400);left:auto;right:10px;">Agotado</span>{% endif %}
+              </div>
+              <div class="card-body">
+                <div class="cat-label">{{ p.cat_nombre or '' }}</div>
+                <h3>{{ p.nombre }}</h3>
+                <div class="prices">
+                  <span class="price-current">${{ '{:,.0f}'.format(p.precio_oferta if p.precio_oferta else p.precio) }}</span>
+                  {% if p.precio_oferta %}<span class="price-original">${{ '{:,.0f}'.format(p.precio) }}</span>{% endif %}
+                </div>
+              </div>
+            </a>
+            <div class="card-actions">
+              {% if p.stock > 0 %}
+              <form action="{{ url_for('agregar_carrito', slug=p.slug) }}" method="POST" style="flex:1;">
+                <input type="hidden" name="cantidad" value="1">
+                <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">🛍️ Agregar</button>
+              </form>
+              {% else %}
+              <button class="btn btn-sm" style="width:100%;background:var(--gray-200);color:var(--gray-400);cursor:not-allowed;flex:1;" disabled>Agotado</button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <h3>Sin resultados</h3>
+          <p>No encontramos productos con esos filtros. Intenta con otro término.</p>
+          <a href="{{ url_for('tienda') }}" class="btn btn-primary" style="margin-top:20px;">Ver todos los productos</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

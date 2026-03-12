@@ -1,0 +1,21 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Usuarias{% endblock %}
+{% block page_title %}Gestión de usuarias{% endblock %}
+{% block content %}
+<div class="card">
+  <table>
+    <thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Rol</th><th>Registro</th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td><strong>{{ u.nombre }}</strong></td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.telefono or '—' }}</td>
+        <td><span class="badge {% if u.rol=='admin' %}badge-danger{% elif u.rol=='abogado' %}badge-warning{% else %}badge-teal{% endif %}">{{ u.rol }}</span></td>
+        <td style="color:var(--gray-400);font-size:13px;">{{ u.fecha_registro[:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

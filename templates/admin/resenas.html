@@ -1,0 +1,35 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Reseñas{% endblock %}
+{% block page_title %}Gestión de reseñas{% endblock %}
+{% block content %}
+<div class="card">
+  <table>
+    <thead><tr><th>Producto</th><th>Clienta</th><th>Calificación</th><th>Comentario</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      {% for r in resenas %}
+      <tr>
+        <td><strong>{{ r.prod_nombre }}</strong></td>
+        <td>{{ r.nombre }}</td>
+        <td style="color:#F59E0B;">{{ '★' * r.calificacion }}{{ '☆' * (5 - r.calificacion) }}</td>
+        <td style="font-size:13px;color:var(--gray-600);max-width:260px;">{{ r.comentario or '—' }}</td>
+        <td><span class="badge {% if r.aprobada %}badge-success{% else %}badge-warning{% endif %}">{{ 'Aprobada' if r.aprobada else 'Pendiente' }}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            {% if not r.aprobada %}
+            <form action="{{ url_for('admin_aprobar_resena', rid=r.id) }}" method="POST">
+              <button type="submit" class="btn btn-sm btn-primary">✅</button>
+            </form>
+            {% endif %}
+            <form action="{{ url_for('admin_eliminar_resena', rid=r.id) }}" method="POST" onsubmit="return confirm('¿Eliminar?')">
+              <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray-400);">Sin reseñas</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

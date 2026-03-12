@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}{{ prod.nombre }} — Pupalu{% endblock %}
+{% block extra_style %}
+.breadcrumb { padding: 16px 0; font-size: 13px; color: var(--gray-400); }
+.breadcrumb a { color: var(--teal); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.prod-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding: 24px 0 60px; }
+.prod-img-main {
+  aspect-ratio: 1; border-radius: 20px; overflow: hidden;
+  background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 100px;
+}
+.prod-img-main img { width: 100%; height: 100%; object-fit: cover; }
+.prod-info { padding: 8px 0; }
+.prod-cat { font-size: 13px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.prod-title { font-family: var(--font-serif); font-size: 38px; line-height: 1.2; color: var(--ink); margin-bottom: 16px; }
+.prod-prices { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.prod-prices .current { font-size: 32px; font-weight: 700; color: var(--teal-dark); }
+.prod-prices .original { font-size: 20px; color: var(--gray-400); text-decoration: line-through; }
+.prod-prices .pct { background: var(--accent); color: white; font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.prod-desc { font-size: 15px; color: var(--gray-600); line-height: 1.8; margin-bottom: 28px; }
+.stock-info { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 24px; }
+.stock-dot { width: 8px; height: 8px; border-radius: 50%; }
+.qty-selector { display: flex; align-items: center; gap: 0; border: 1.5px solid var(--gray-200); border-radius: 10px; overflow: hidden; width: fit-content; margin-bottom: 20px; }
+.qty-btn { width: 40px; height: 40px; border: none; background: var(--gray-100); cursor: pointer; font-size: 18px; color: var(--ink); transition: background 0.15s; display:flex;align-items:center;justify-content:center; }
+.qty-btn:hover { background: var(--teal-pale); }
+.qty-input { width: 56px; height: 40px; border: none; border-left: 1px solid var(--gray-200); border-right: 1px solid var(--gray-200); text-align: center; font-size: 16px; font-family: var(--font-sans); font-weight: 600; }
+.qty-input:focus { outline: none; }
+.add-actions { display: flex; gap: 12px; margin-bottom: 28px; }
+.add-actions .btn-add { flex: 1; justify-content: center; padding: 14px; font-size: 15px; }
+.divider { border: none; border-top: 1px solid var(--gray-200); margin: 24px 0; }
+.prod-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.meta-item { background: var(--teal-ultra); border-radius: 10px; padding: 12px 16px; }
+.meta-item .label { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.meta-item .value { font-size: 14px; color: var(--ink); font-weight: 500; }
+
+.resenas-section { padding: 60px 0; background: var(--gray-100); }
+.stars { color: #F59E0B; font-size: 18px; }
+.star-input { display: flex; gap: 6px; }
+.star-input input { display: none; }
+.star-input label { font-size: 24px; cursor: pointer; color: var(--gray-200); transition: color 0.15s; }
+.star-input input:checked ~ label, .star-input label:hover, .star-input label:hover ~ label { color: #F59E0B; }
+.star-input { flex-direction: row-reverse; }
+.star-input label:hover, .star-input label:hover ~ label, .star-input input:checked ~ label { color: #F59E0B; }
+
+@media (max-width: 768px) {
+  .prod-layout { grid-template-columns: 1fr; gap: 28px; }
+  .prod-title { font-size: 28px; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb">
+    <a href="{{ url_for('index') }}">Inicio</a> › 
+    <a href="{{ url_for('tienda') }}">Tienda</a> › 
+    {% if prod.cat_nombre %}<a href="{{ url_for('tienda', categoria=prod.categoria_id) }}">{{ prod.cat_nombre }}</a> › {% endif %}
+    {{ prod.nombre }}
+  </div>
+
+  <div class="prod-layout">
+    <!-- IMAGEN -->
+    <div>
+      <div class="prod-img-main">
+        {% if prod.imagen %}
+          <img src="{{ url_for('static', filename='uploads/' + prod.imagen) }}" alt="{{ prod.nombre }}">
+        {% else %}🌸{% endif %}
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="prod-info">
+      <div class="prod-cat">{{ prod.cat_nombre or 'Pupalu' }}</div>
+      <h1 class="prod-title">{{ prod.nombre }}</h1>
+
+      <div class="prod-prices">
+        <span class="current">${{ '{:,.0f}'.format(prod.precio_oferta if prod.precio_oferta else prod.precio) }}</span>
+        {% if prod.precio_oferta %}
+          <span class="original">${{ '{:,.0f}'.format(prod.precio) }}</span>
+          <span class="pct">-{{ ((1 - prod.precio_oferta/prod.precio)*100)|int }}%</span>
+        {% endif %}
+      </div>
+
+      <p class="prod-desc">{{ prod.descripcion or 'Hermoso producto de nuestra colección Pupalu.' }}</p>
+
+      <div class="stock-info">
+        {% if prod.stock > 0 %}
+          <div class="stock-dot" style="background:var(--success);"></div>
+          <span style="color:var(--success); font-weight:600;">En stock</span>
+          <span style="color:var(--gray-400);">({{ prod.stock }} disponibles)</span>
+        {% else %}
+          <div class="stock-dot" style="background:var(--danger);"></div>
+          <span style="color:var(--danger); font-weight:600;">Agotado</span>
+        {% endif %}
+      </div>
+
+      {% if prod.stock > 0 %}
+      <form action="{{ url_for('agregar_carrito', slug=prod.slug) }}" method="POST">
+        <div class="qty-selector">
+          <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+          <input type="number" name="cantidad" id="qty" class="qty-input" value="1" min="1" max="{{ prod.stock }}">
+          <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <div class="add-actions">
+          <button type="submit" class="btn btn-primary btn-add">🛍️ Agregar al carrito</button>
+          {% if session.get('user_id') %}
+          <form action="{{ url_for('toggle_favorito', prod_id=prod.id) }}" method="POST" style="display:contents;">
+            <button type="submit" class="btn btn-outline" title="Favorito">{{ '💚' if es_favorito else '🤍' }}</button>
+          </form>
+          {% endif %}
+        </div>
+      </form>
+      {% else %}
+        <button class="btn" style="background:var(--gray-200);color:var(--gray-400);cursor:not-allowed;padding:14px 32px;" disabled>Producto agotado</button>
+      {% endif %}
+
+      <hr class="divider">
+      <div class="prod-meta">
+        <div class="meta-item"><div class="label">Envío</div><div class="value">🚚 A todo Chile</div></div>
+        <div class="meta-item"><div class="label">Garantía</div><div class="value">↩️ 30 días</div></div>
+        <div class="meta-item"><div class="label">Pago</div><div class="value">💳 Transferencia / WebPay</div></div>
+        <div class="meta-item"><div class="label">Calidad</div><div class="value">💎 Hecho con amor</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESEÑAS -->
+<section class="resenas-section">
+  <div class="container">
+    <h2 style="font-family:var(--font-serif);font-size:28px;margin-bottom:32px;">Reseñas de clientas 💬</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+      <!-- Lista -->
+      <div>
+        {% if resenas %}
+          {% for r in resenas %}
+          <div class="card" style="padding:20px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+              <strong style="color:var(--ink);">{{ r.nombre }}</strong>
+              <span class="stars">{{ '★' * r.calificacion }}{{ '☆' * (5 - r.calificacion) }}</span>
+            </div>
+            {% if r.comentario %}<p style="font-size:14px;color:var(--gray-600);">{{ r.comentario }}</p>{% endif %}
+            <div style="font-size:12px;color:var(--gray-400);margin-top:6px;">{{ r.fecha[:10] }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--gray-600);">Sé la primera en dejar una reseña 💚</p>
+        {% endif %}
+      </div>
+      <!-- Formulario -->
+      <div class="card" style="padding:28px;">
+        <h3 style="font-family:var(--font-serif);font-size:22px;margin-bottom:20px;">Deja tu reseña</h3>
+        <form action="{{ url_for('agregar_resena', prod_id=prod.id) }}" method="POST">
+          <div class="form-group">
+            <label>Tu nombre</label>
+            <input type="text" name="nombre" class="form-control" required placeholder="María González"
+                   value="{{ session.get('nombre', '') }}">
+          </div>
+          <div class="form-group">
+            <label>Calificación</label>
+            <div class="star-input">
+              {% for i in range(5,0,-1) %}
+              <input type="radio" name="calificacion" id="star{{ i }}" value="{{ i }}" {% if i==5 %}checked{% endif %}>
+              <label for="star{{ i }}">★</label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Comentario (opcional)</label>
+            <textarea name="comentario" class="form-control" placeholder="¿Qué te pareció el producto?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Enviar reseña 💚</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RELACIONADOS -->
+{% if relacionados %}
+<section class="section">
+  <div class="container">
+    <h2 style="font-family:var(--font-serif);font-size:28px;margin-bottom:28px;">También te puede gustar</h2>
+    <div class="products-grid">
+      {% for p in relacionados %}
+      <div class="card product-card">
+        <a href="{{ url_for('producto', slug=p.slug) }}" style="text-decoration:none;">
+          <div class="img-wrap">
+            {% if p.imagen %}<img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}">
+            {% else %}<div class="img-placeholder">🌸</div>{% endif %}
+          </div>
+          <div class="card-body">
+            <h3>{{ p.nombre }}</h3>
+            <div class="prices">
+              <span class="price-current">${{ '{:,.0f}'.format(p.precio_oferta if p.precio_oferta else p.precio) }}</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<script>
+function changeQty(delta) {
+  const input = document.getElementById('qty');
+  const val = parseInt(input.value) + delta;
+  const max = parseInt(input.max);
+  input.value = Math.max(1, Math.min(val, max));
+}
+</script>
+{% endblock %}

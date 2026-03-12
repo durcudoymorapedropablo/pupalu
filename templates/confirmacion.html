@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}¡Pedido confirmado! — Pupalu{% endblock %}
+{% block content %}
+<div style="text-align:center;padding:80px 24px;">
+  <div style="font-size:80px;margin-bottom:20px;animation:bounce 1s ease;">💚</div>
+  <h1 style="font-family:var(--font-serif);font-size:42px;color:var(--ink);margin-bottom:12px;">¡Pedido confirmado!</h1>
+  {% if numero %}
+  <p style="font-size:20px;color:var(--gray-600);margin-bottom:8px;">Número de pedido: <strong style="color:var(--teal);">{{ numero }}</strong></p>
+  {% endif %}
+  <p style="font-size:16px;color:var(--gray-600);max-width:480px;margin:0 auto 36px;line-height:1.7;">
+    Te contactaremos pronto con los detalles del envío. ¡Gracias por elegir Pupalu! 🌸
+  </p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="{{ url_for('tienda') }}" class="btn btn-primary btn-lg">Seguir comprando</a>
+    <a href="{{ url_for('mi_cuenta') }}" class="btn btn-outline btn-lg">Ver mis pedidos</a>
+  </div>
+</div>
+<style>@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}</style>
+{% endblock %}

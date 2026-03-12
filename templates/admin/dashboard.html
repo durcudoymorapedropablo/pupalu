@@ -1,0 +1,72 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card teal">
+    <div class="stat-icon">📦</div>
+    <div class="stat-value">{{ stats.total_pedidos }}</div>
+    <div class="stat-label">Total pedidos</div>
+  </div>
+  <div class="stat-card warning">
+    <div class="stat-icon">⏳</div>
+    <div class="stat-value">{{ stats.pedidos_pendientes }}</div>
+    <div class="stat-label">Pendientes</div>
+  </div>
+  <div class="stat-card success">
+    <div class="stat-icon">👗</div>
+    <div class="stat-value">{{ stats.total_productos }}</div>
+    <div class="stat-label">Productos activos</div>
+  </div>
+  <div class="stat-card accent">
+    <div class="stat-icon">👩</div>
+    <div class="stat-value">{{ stats.total_clientes }}</div>
+    <div class="stat-label">Clientas</div>
+  </div>
+  <div class="stat-card teal">
+    <div class="stat-icon">💰</div>
+    <div class="stat-value">${{ '{:,.0f}'.format(stats.ventas_hoy) }}</div>
+    <div class="stat-label">Ventas hoy</div>
+  </div>
+  <div class="stat-card success">
+    <div class="stat-icon">📈</div>
+    <div class="stat-value">${{ '{:,.0f}'.format(stats.ventas_mes) }}</div>
+    <div class="stat-label">Ventas este mes</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
+  <div class="card">
+    <div class="card-header"><h3>Pedidos recientes</h3><a href="{{ url_for('admin_pedidos') }}" class="btn btn-sm btn-outline">Ver todos</a></div>
+    <table>
+      <thead><tr><th>Número</th><th>Clienta</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
+      <tbody>
+        {% for p in pedidos_recientes %}
+        <tr>
+          <td><a href="{{ url_for('admin_ver_pedido', pid=p.id) }}" style="color:var(--teal);text-decoration:none;font-weight:600;">{{ p.numero }}</a></td>
+          <td>{{ p.nombre_cliente }}</td>
+          <td><strong>${{ '{:,.0f}'.format(p.total) }}</strong></td>
+          <td><span class="badge status-{{ p.estado }}">{{ p.estado }}</span></td>
+          <td style="color:var(--gray-400);">{{ p.fecha[:10] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:40px;">Sin pedidos aún</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>⚠️ Sin stock</h3></div>
+    <div class="card-body">
+      {% for p in productos_sin_stock %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+        <span style="font-size:14px;">{{ p.nombre }}</span>
+        <span class="badge badge-danger">Agotado</span>
+      </div>
+      {% else %}
+      <p style="color:var(--gray-400);text-align:center;padding:20px;">✅ Todo en stock</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

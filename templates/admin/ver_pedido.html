@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Pedido {{ pedido.numero }}{% endblock %}
+{% block page_title %}Pedido {{ pedido.numero }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin_pedidos') }}" class="btn btn-sm btn-outline" style="margin-bottom:20px;">← Volver</a>
+<div style="display:grid;grid-template-columns:1fr 320px;gap:24px;">
+  <div>
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header"><h3>📦 Productos del pedido</h3></div>
+      <table>
+        <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td><strong>{{ item.nombre_producto }}</strong></td>
+            <td>${{ '{:,.0f}'.format(item.precio_unitario) }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td><strong>${{ '{:,.0f}'.format(item.subtotal) }}</strong></td>
+          </tr>
+          {% endfor %}
+          <tr style="background:var(--teal-ultra);">
+            <td colspan="3"><strong>TOTAL</strong></td>
+            <td><strong style="color:var(--teal-dark);font-size:16px;">${{ '{:,.0f}'.format(pedido.total) }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {% if pedido.notas %}
+    <div class="card">
+      <div class="card-header"><h3>📝 Notas</h3></div>
+      <div class="card-body"><p style="color:var(--gray-600);">{{ pedido.notas }}</p></div>
+    </div>
+    {% endif %}
+  </div>
+  <div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header"><h3>👩 Datos de entrega</h3></div>
+      <div class="card-body" style="font-size:14px;">
+        {% for lbl, val in [('Nombre', pedido.nombre_cliente),('Email', pedido.email_cliente),('Teléfono', pedido.telefono or '—'),('Dirección', pedido.direccion),('Ciudad', pedido.ciudad),('Región', pedido.region or '—'),('Pago', pedido.metodo_pago)] %}
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+          <span style="color:var(--gray-400);">{{ lbl }}</span>
+          <span style="font-weight:500;">{{ val }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>🔄 Cambiar estado</h3></div>
+      <div class="card-body">
+        <div style="margin-bottom:12px;"><span class="badge status-{{ pedido.estado }}" style="font-size:14px;padding:6px 14px;">Actual: {{ pedido.estado }}</span></div>
+        <form action="{{ url_for('admin_estado_pedido', pid=pedido.id) }}" method="POST">
+          <select name="estado" class="form-control" style="margin-bottom:10px;">
+            {% for est in ['pendiente','confirmado','enviado','entregado','cancelado'] %}
+            <option value="{{ est }}" {% if est==pedido.estado %}selected{% endif %}>{{ est.title() }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Actualizar estado</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Categorías{% endblock %}
+{% block page_title %}Gestión de categorías{% endblock %}
+{% block extra_style %}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:16px;padding:28px;width:90%;max-width:440px;}
+.modal h3{font-family:var(--font-serif);font-size:22px;margin-bottom:20px;}
+{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+  <button onclick="document.getElementById('modal-cat').classList.add('open')" class="btn btn-primary">+ Nueva categoría</button>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Nombre</th><th>Slug</th><th>Descripción</th><th>Productos</th><th>Estado</th></tr></thead>
+    <tbody>
+      {% for c in categorias %}
+      <tr>
+        <td><strong>{{ c.nombre }}</strong></td>
+        <td style="color:var(--gray-400);font-size:13px;">{{ c.slug }}</td>
+        <td style="font-size:13px;color:var(--gray-600);">{{ c.descripcion or '—' }}</td>
+        <td><span class="badge badge-teal">{{ c.num_productos }}</span></td>
+        <td><span class="badge {% if c.activo %}badge-success{% else %}badge-gray{% endif %}">{{ 'Activa' if c.activo else 'Inactiva' }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="modal-overlay" id="modal-cat" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>📁 Nueva categoría</h3>
+    <form method="POST" action="{{ url_for('admin_nueva_categoria') }}" enctype="multipart/form-data">
+      <div class="form-group"><label>Nombre *</label><input type="text" name="nombre" class="form-control" required></div>
+      <div class="form-group"><label>Descripción</label><textarea name="descripcion" class="form-control" rows="2"></textarea></div>
+      <div class="form-group"><label>Imagen</label><input type="file" name="imagen" class="form-control" accept="image/*"></div>
+      <div class="form-group"><label>Orden</label><input type="number" name="orden" class="form-control" value="0" min="0"></div>
+      <div class="form-group"><label><input type="checkbox" name="activo" checked> ✅ Activa</label></div>
+      <div style="display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary" style="flex:1;">Crear</button>
+        <button type="button" onclick="document.getElementById('modal-cat').classList.remove('open')" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

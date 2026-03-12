@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Crear cuenta — Pupalu{% endblock %}
+{% block extra_style %}
+.auth-page { min-height: 70vh; display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+.auth-card { background:var(--white); border:1px solid var(--gray-200); border-radius:20px; padding:40px; width:100%; max-width:440px; box-shadow:var(--shadow-md); }
+.auth-logo { text-align:center; margin-bottom:24px; }
+.auth-logo img { height:70px; }
+{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Pupalu" onerror="this.style.display='none'">
+    </div>
+    <h1 style="font-family:var(--font-serif);font-size:26px;text-align:center;color:var(--ink);margin-bottom:4px;">Crear cuenta 🌸</h1>
+    <p style="text-align:center;font-size:14px;color:var(--gray-600);margin-bottom:24px;">Únete a la comunidad Pupalu</p>
+    <form method="POST" action="{{ url_for('registro') }}">
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" name="nombre" class="form-control" required autofocus placeholder="María González">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required placeholder="tu@correo.cl">
+      </div>
+      <div class="form-group">
+        <label>Teléfono (opcional)</label>
+        <input type="tel" name="telefono" class="form-control" placeholder="+56 9 1234 5678">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" class="form-control" required placeholder="Mínimo 8 caracteres" minlength="6">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-top:8px;">Crear cuenta →</button>
+    </form>
+    <p style="text-align:center;font-size:14px;color:var(--gray-600);margin-top:20px;">
+      ¿Ya tienes cuenta? <a href="{{ url_for('login') }}" style="color:var(--teal);font-weight:600;">Inicia sesión</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

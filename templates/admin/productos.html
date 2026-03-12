@@ -1,0 +1,126 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Productos{% endblock %}
+{% block page_title %}Gestión de productos{% endblock %}
+{% block extra_style %}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:16px;padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-family:var(--font-serif);font-size:22px;margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-full{grid-column:1/-1;}
+{% endblock %}
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <div></div>
+  <button onclick="document.getElementById('modal-nuevo').classList.add('open')" class="btn btn-primary">+ Nuevo producto</button>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Destacado</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      {% for p in productos %}
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:8px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0;">
+              {% if p.imagen %}<img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" style="width:100%;height:100%;object-fit:cover;">{% else %}🌸{% endif %}
+            </div>
+            <div><strong>{{ p.nombre }}</strong><div style="font-size:12px;color:var(--gray-400);">{{ p.slug }}</div></div>
+          </div>
+        </td>
+        <td>{{ p.cat_nombre or '—' }}</td>
+        <td>
+          ${{ '{:,.0f}'.format(p.precio) }}
+          {% if p.precio_oferta %}<div style="font-size:12px;color:var(--teal);">Oferta: ${{ '{:,.0f}'.format(p.precio_oferta) }}</div>{% endif %}
+        </td>
+        <td><span class="badge {% if p.stock == 0 %}badge-danger{% elif p.stock < 5 %}badge-warning{% else %}badge-success{% endif %}">{{ p.stock }}</span></td>
+        <td>{{ '⭐' if p.destacado else '—' }}</td>
+        <td><span class="badge {% if p.activo %}badge-teal{% else %}badge-gray{% endif %}">{{ 'Activo' if p.activo else 'Inactivo' }}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button onclick="editarProducto({{ p.id }}, '{{ p.nombre|e }}', '{{ p.descripcion|e if p.descripcion else '' }}', {{ p.precio }}, {{ p.precio_oferta or 'null' }}, {{ p.stock }}, {{ p.categoria_id or 'null' }}, {{ p.destacado }}, {{ p.activo }})" class="btn btn-sm btn-outline">✏️</button>
+            <form action="{{ url_for('admin_eliminar_producto', pid=p.id) }}" method="POST" onsubmit="return confirm('¿Eliminar?')">
+              <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-400);">Sin productos</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- MODAL NUEVO -->
+<div class="modal-overlay" id="modal-nuevo" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>✨ Nuevo producto</h3>
+    <form method="POST" action="{{ url_for('admin_nuevo_producto') }}" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Nombre *</label><input type="text" name="nombre" class="form-control" required></div>
+        <div class="form-group form-full"><label>Descripción</label><textarea name="descripcion" class="form-control" rows="3"></textarea></div>
+        <div class="form-group"><label>Precio *</label><input type="number" name="precio" class="form-control" required min="0" step="1"></div>
+        <div class="form-group"><label>Precio oferta</label><input type="number" name="precio_oferta" class="form-control" min="0" step="1"></div>
+        <div class="form-group"><label>Stock *</label><input type="number" name="stock" class="form-control" required min="0" value="0"></div>
+        <div class="form-group"><label>Categoría</label>
+          <select name="categoria_id" class="form-control">
+            <option value="">Sin categoría</option>
+            {% for c in categorias %}<option value="{{ c.id }}">{{ c.nombre }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group form-full"><label>Imagen</label><input type="file" name="imagen" class="form-control" accept="image/*"></div>
+        <div class="form-group"><label><input type="checkbox" name="destacado"> ⭐ Destacado</label></div>
+        <div class="form-group"><label><input type="checkbox" name="activo" checked> ✅ Activo</label></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="submit" class="btn btn-primary" style="flex:1;">Crear producto</button>
+        <button type="button" onclick="document.getElementById('modal-nuevo').classList.remove('open')" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modal-editar" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <h3>✏️ Editar producto</h3>
+    <form method="POST" id="form-editar" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Nombre *</label><input type="text" name="nombre" id="e-nombre" class="form-control" required></div>
+        <div class="form-group form-full"><label>Descripción</label><textarea name="descripcion" id="e-desc" class="form-control" rows="3"></textarea></div>
+        <div class="form-group"><label>Precio *</label><input type="number" name="precio" id="e-precio" class="form-control" required></div>
+        <div class="form-group"><label>Precio oferta</label><input type="number" name="precio_oferta" id="e-oferta" class="form-control"></div>
+        <div class="form-group"><label>Stock</label><input type="number" name="stock" id="e-stock" class="form-control"></div>
+        <div class="form-group"><label>Categoría</label>
+          <select name="categoria_id" id="e-cat" class="form-control">
+            <option value="">Sin categoría</option>
+            {% for c in categorias %}<option value="{{ c.id }}">{{ c.nombre }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group form-full"><label>Nueva imagen (opcional)</label><input type="file" name="imagen" class="form-control" accept="image/*"></div>
+        <div class="form-group"><label><input type="checkbox" name="destacado" id="e-dest"> ⭐ Destacado</label></div>
+        <div class="form-group"><label><input type="checkbox" name="activo" id="e-activo"> ✅ Activo</label></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="submit" class="btn btn-primary" style="flex:1;">Guardar cambios</button>
+        <button type="button" onclick="document.getElementById('modal-editar').classList.remove('open')" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function editarProducto(id, nombre, desc, precio, oferta, stock, cat, dest, activo) {
+  document.getElementById('e-nombre').value = nombre;
+  document.getElementById('e-desc').value = desc;
+  document.getElementById('e-precio').value = precio;
+  document.getElementById('e-oferta').value = oferta || '';
+  document.getElementById('e-stock').value = stock;
+  document.getElementById('e-cat').value = cat || '';
+  document.getElementById('e-dest').checked = dest == 1;
+  document.getElementById('e-activo').checked = activo == 1;
+  document.getElementById('form-editar').action = `/admin/productos/${id}/editar`;
+  document.getElementById('modal-editar').classList.add('open');
+}
+</script>
+{% endblock %}

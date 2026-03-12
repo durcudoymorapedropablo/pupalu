@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Mi Carrito — Pupalu{% endblock %}
+{% block extra_style %}
+.carrito-layout { display: grid; grid-template-columns: 1fr 360px; gap: 32px; padding: 40px 0; }
+.carrito-items .item-row {
+  display: grid; grid-template-columns: 80px 1fr auto auto auto;
+  gap: 16px; align-items: center;
+  padding: 20px 0; border-bottom: 1px solid var(--gray-200);
+}
+.item-thumb { width: 80px; height: 80px; border-radius: 10px; overflow: hidden; background: var(--gray-100); display:flex;align-items:center;justify-content:center;font-size:32px; }
+.item-thumb img { width:100%;height:100%;object-fit:cover; }
+.item-name { font-family: var(--font-serif); font-size: 16px; color: var(--ink); }
+.item-price { color: var(--gray-600); font-size: 14px; margin-top: 4px; }
+.qty-mini { display:flex;align-items:center;gap:0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden; }
+.qty-mini button { width:32px;height:32px;border:none;background:var(--gray-100);cursor:pointer;font-size:16px;transition:background 0.15s; }
+.qty-mini button:hover { background:var(--teal-pale); }
+.qty-mini input { width:44px;height:32px;border:none;border-left:1px solid var(--gray-200);border-right:1px solid var(--gray-200);text-align:center;font-size:14px;font-weight:600; }
+.item-subtotal { font-weight:700;color:var(--teal-dark);font-size:16px;text-align:right; }
+.resumen-card { background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;height:fit-content;position:sticky;top:80px; }
+.resumen-card h3 { font-family:var(--font-serif);font-size:22px;margin-bottom:20px; }
+.resumen-row { display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px;color:var(--gray-600); }
+.resumen-row.total { font-size:18px;font-weight:700;color:var(--ink);border-top:1px solid var(--gray-200);padding-top:12px;margin-top:4px; }
+.cupon-input { display:flex;gap:8px;margin:16px 0; }
+.cupon-input input { flex:1; }
+.empty-carrito { text-align:center;padding:80px 20px; }
+@media (max-width: 768px) {
+  .carrito-layout { grid-template-columns: 1fr; }
+  .item-row { grid-template-columns: 60px 1fr; }
+  .item-subtotal,.qty-mini { grid-column: 2; }
+}
+{% endblock %}
+{% block content %}
+<div class="container">
+  <h1 style="font-family:var(--font-serif);font-size:36px;padding:32px 0 0;">Mi carrito 🛍️</h1>
+  {% if items %}
+  <div class="carrito-layout">
+    <div class="carrito-items">
+      {% for item in items %}
+      <div class="item-row">
+        <div class="item-thumb">
+          {% if item.imagen %}<img src="{{ url_for('static', filename='uploads/' + item.imagen) }}" alt="{{ item.nombre }}">
+          {% else %}🌸{% endif %}
+        </div>
+        <div>
+          <div class="item-name">{{ item.nombre }}</div>
+          <div class="item-price">${{ '{:,.0f}'.format(item.precio_actual) }} c/u</div>
+        </div>
+        <form action="{{ url_for('actualizar_carrito') }}" method="POST" style="display:contents;">
+          <input type="hidden" name="slug" value="{{ item.slug }}">
+          <div class="qty-mini">
+            <button type="button" onclick="this.closest('form').querySelector('input[name=cantidad]').stepDown();this.closest('form').submit()">−</button>
+            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="0" max="{{ item.stock }}" onchange="this.form.submit()">
+            <button type="button" onclick="this.closest('form').querySelector('input[name=cantidad]').stepUp();this.closest('form').submit()">+</button>
+          </div>
+        </form>
+        <div class="item-subtotal">${{ '{:,.0f}'.format(item.subtotal) }}</div>
+        <form action="{{ url_for('eliminar_carrito', slug=item.slug) }}" method="POST">
+          <button type="submit" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:18px;" title="Eliminar">✕</button>
+        </form>
+      </div>
+      {% endfor %}
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+        <form action="{{ url_for('vaciar_carrito') }}" method="POST">
+          <button type="submit" class="btn btn-sm" style="background:var(--gray-100);color:var(--gray-600);">Vaciar carrito</button>
+        </form>
+      </div>
+    </div>
+    <div class="resumen-card">
+      <h3>Resumen</h3>
+      <div class="resumen-row"><span>Subtotal</span><span>${{ '{:,.0f}'.format(total) }}</span></div>
+      <div class="resumen-row"><span>Envío</span><span style="color:var(--success);">Gratis 🚚</span></div>
+      <div id="descuento-row" class="resumen-row" style="display:none;color:var(--teal-dark);">
+        <span>Descuento</span><span id="descuento-val"></span>
+      </div>
+      <div class="resumen-row total"><span>Total</span><span id="total-final">${{ '{:,.0f}'.format(total) }}</span></div>
+      <div class="cupon-input">
+        <input type="text" id="cupon-input" class="form-control" placeholder="Código de cupón" value="PUPALU10">
+        <button onclick="aplicarCupon()" class="btn btn-outline btn-sm">Aplicar</button>
+      </div>
+      <div id="cupon-msg" style="font-size:13px;margin-bottom:12px;"></div>
+      <a href="{{ url_for('checkout') }}" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">Proceder al pago →</a>
+      <a href="{{ url_for('tienda') }}" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:10px;">Seguir comprando</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-carrito">
+    <div style="font-size:80px;margin-bottom:16px;">🛍️</div>
+    <h2 style="font-family:var(--font-serif);font-size:28px;color:var(--ink);margin-bottom:8px;">Tu carrito está vacío</h2>
+    <p style="color:var(--gray-600);margin-bottom:28px;">¡Explora nuestra tienda y encuentra algo que ames!</p>
+    <a href="{{ url_for('tienda') }}" class="btn btn-primary btn-lg">Ir a la tienda →</a>
+  </div>
+  {% endif %}
+</div>
+<script>
+const totalBase = {{ total }};
+let descuento = 0;
+function aplicarCupon() {
+  const codigo = document.getElementById('cupon-input').value;
+  fetch('/api/cupon', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo,total:totalBase})})
+    .then(r=>r.json()).then(data=>{
+      const msg = document.getElementById('cupon-msg');
+      msg.textContent = data.mensaje;
+      msg.style.color = data.ok ? 'var(--success)' : 'var(--danger)';
+      if(data.ok){
+        descuento = data.descuento;
+        document.getElementById('descuento-row').style.display = 'flex';
+        document.getElementById('descuento-val').textContent = '-$' + Math.round(descuento).toLocaleString('es-CL');
+        document.getElementById('total-final').textContent = '$' + Math.round(totalBase - descuento).toLocaleString('es-CL');
+      }
+    });
+}
+</script>
+{% endblock %}

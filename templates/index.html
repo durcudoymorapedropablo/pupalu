@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Pupalu — Moda femenina hecha con amor{% endblock %}
+
+{% block extra_style %}
+.hero {
+  background: linear-gradient(135deg, var(--teal-pale) 0%, var(--white) 60%, #fff0f5 100%);
+  padding: 80px 0;
+  overflow: hidden; position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(61,191,191,0.12), transparent 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 1280px; margin: 0 auto; padding: 0 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.hero-eyebrow {
+  font-size: 13px; font-weight: 700; color: var(--teal);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: var(--font-serif); font-size: 52px; line-height: 1.15;
+  color: var(--ink); margin-bottom: 20px;
+}
+.hero h1 em { color: var(--teal); font-style: italic; }
+.hero p {
+  font-size: 17px; color: var(--gray-600); line-height: 1.7;
+  margin-bottom: 32px; max-width: 420px;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-img {
+  position: relative; aspect-ratio: 4/5;
+  background: linear-gradient(135deg, var(--teal-pale), var(--teal-ultra));
+  border-radius: 24px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 120px;
+}
+.hero-floats {
+  position: absolute; bottom: 24px; left: 24px;
+  background: white; border-radius: 16px;
+  padding: 14px 18px; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-floats .num { font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--teal); }
+.hero-floats .lbl { font-size: 13px; color: var(--gray-600); }
+
+.section-title {
+  font-family: var(--font-serif); font-size: 36px;
+  color: var(--ink); margin-bottom: 8px;
+}
+.section-sub { color: var(--gray-600); font-size: 16px; margin-bottom: 40px; }
+
+.cats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.cat-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 16px; padding: 28px 20px; text-align: center;
+  text-decoration: none; color: var(--ink);
+  transition: all 0.25s; display: block;
+}
+.cat-card:hover { border-color: var(--teal); box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.cat-card .cat-icon { font-size: 40px; margin-bottom: 12px; }
+.cat-card h3 { font-family: var(--font-serif); font-size: 20px; margin-bottom: 4px; }
+.cat-card span { font-size: 13px; color: var(--gray-600); }
+
+.ofertas-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;
+}
+.oferta-badge {
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+  color: white; padding: 4px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+
+.banner-promo {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  border-radius: 20px; padding: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: white; gap: 32px;
+}
+.banner-promo h2 { font-family: var(--font-serif); font-size: 36px; margin-bottom: 8px; }
+.banner-promo p { opacity: 0.85; font-size: 16px; }
+.banner-promo .btn-white {
+  background: white; color: var(--teal-dark); font-weight: 700;
+  padding: 14px 32px; border-radius: 12px; text-decoration: none;
+  font-family: var(--font-sans); font-size: 15px; white-space: nowrap;
+  transition: all 0.2s;
+}
+.banner-promo .btn-white:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.2); transform: translateY(-2px); }
+
+@media (max-width: 768px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 36px; }
+  .hero-img { display: none; }
+  .cats-grid { grid-template-columns: repeat(2, 1fr); }
+  .banner-promo { flex-direction: column; text-align: center; padding: 32px 24px; }
+}
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">✨ Nueva colección 2025</div>
+      <h1>Moda femenina <em>hecha con amor</em></h1>
+      <p>Prendas únicas, accesorios artesanales y joyería pensada para mujeres que aman expresarse con estilo propio.</p>
+      <div class="hero-btns">
+        <a href="{{ url_for('tienda') }}" class="btn btn-primary btn-lg">Ver colección →</a>
+        <a href="{{ url_for('tienda', categoria='ofertas') }}" class="btn btn-outline btn-lg">Ofertas 🏷️</a>
+      </div>
+    </div>
+    <div class="hero-img">
+      🌸
+      <div class="hero-floats">
+        <div class="num">+200</div>
+        <div class="lbl">productos<br>disponibles</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORÍAS -->
+<section class="section">
+  <div class="container">
+    <div class="section-title">Explora por categoría</div>
+    <p class="section-sub">Encuentra exactamente lo que buscas</p>
+    <div class="cats-grid">
+      <a href="{{ url_for('tienda', categoria='ropa') }}" class="cat-card">
+        <div class="cat-icon">👗</div>
+        <h3>Ropa</h3>
+        <span>Blusas, vestidos y más</span>
+      </a>
+      <a href="{{ url_for('tienda', categoria='accesorios') }}" class="cat-card">
+        <div class="cat-icon">🧣</div>
+        <h3>Accesorios</h3>
+        <span>Complementa tu look</span>
+      </a>
+      <a href="{{ url_for('tienda', categoria='bolsos') }}" class="cat-card">
+        <div class="cat-icon">👜</div>
+        <h3>Bolsos</h3>
+        <span>Bolsos y carteras</span>
+      </a>
+      <a href="{{ url_for('tienda', categoria='joyeria') }}" class="cat-card">
+        <div class="cat-icon">💎</div>
+        <h3>Joyería</h3>
+        <span>Collares, aretes y más</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- DESTACADOS -->
+{% if destacados %}
+<section class="section" style="background: var(--gray-100); padding: 60px 0;">
+  <div class="container">
+    <div class="section-title">Lo más amado 💚</div>
+    <p class="section-sub">Nuestros productos favoritos de la temporada</p>
+    <div class="products-grid">
+      {% for p in destacados %}
+      <div class="card product-card">
+        <a href="{{ url_for('producto', slug=p.slug) }}" style="text-decoration:none;">
+          <div class="img-wrap">
+            {% if p.imagen %}
+              <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" alt="{{ p.nombre }}" loading="lazy">
+            {% else %}
+              <div class="img-placeholder">🌸</div>
+            {% endif %}
+            {% if p.precio_oferta %}<span class="badge-oferta">OFERTA</span>{% endif %}
+          </div>
+          <div class="card-body">
+            <div class="cat-label">{{ p.cat_nombre or '' }}</div>
+            <h3>{{ p.nombre }}</h3>
+            <div class="prices">
+              <span class="price-current">${{ '{:,.0f}'.format(p.precio_oferta if p.precio_oferta else p.precio) }}</span>
+              {% if p.precio_oferta %}
+                <span class="price-original">${{ '{:,.0f}'.format(p.precio) }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+        <div class="card-actions">
+          <form action="{{ url_for('agregar_carrito', slug=p.slug) }}" method="POST" style="flex:1;">
+            <input type="hidden" name="cantidad" value="1">
+            <button type="submit" class="btn btn-primary btn-sm" style="width:100%;">🛍️ Agregar</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="{{ url_for('tienda') }}" class="btn btn-outline btn-lg">Ver todos los productos →</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- BANNER PROMO -->
+<section class="section">
+  <div class="container">
+    <div class="banner-promo">
+      <div>
+        <h2>¡Usa el cupón PUPALU10!</h2>
+        <p>Obtén 10% de descuento en tu primera compra sobre $15.000</p>
+      </div>
+      <a href="{{ url_for('tienda') }}" class="btn-white">Comprar ahora →</a>
+    </div>
+  </div>
+</section>
+
+<!-- VALORES -->
+<section class="section" style="background: var(--teal-ultra);">
+  <div class="container">
+    <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:32px; text-align:center;">
+      {% for icon, titulo, desc in [
+        ('🚚','Envío rápido','Despacho a todo Chile en 3-5 días hábiles'),
+        ('💎','Calidad garantizada','Productos seleccionados con cuidado y amor'),
+        ('↩️','Devolución fácil','30 días para cambios sin preguntas'),
+        ('💬','Atención personalizada','Te respondemos en menos de 24 horas')
+      ] %}
+      <div style="padding:24px;">
+        <div style="font-size:40px; margin-bottom:12px;">{{ icon }}</div>
+        <h4 style="font-family:var(--font-serif); font-size:18px; color:var(--ink); margin-bottom:6px;">{{ titulo }}</h4>
+        <p style="font-size:14px; color:var(--gray-600); line-height:1.6;">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
